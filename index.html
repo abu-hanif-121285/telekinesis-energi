@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TELEKINESIS QUIZ: MIND FORCE</title>
+<style>
+:root{
+  --cyan:#22e7ff; --blue:#2a7bff; --violet:#9b5cff; --yellow:#ffd34d;
+  --green:#3df58a; --red:#ff5470; --text:#eaf6ff; --dim:#9fb3d6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);overflow:hidden}
+body{background:radial-gradient(900px 600px at 15% 0%,rgba(42,123,255,.22),transparent 60%),
+     radial-gradient(900px 600px at 85% 100%,rgba(155,92,255,.22),transparent 60%),
+     linear-gradient(180deg,#060d24,#02050f)}
+button{font-family:inherit}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.screen.on{display:flex}
+.glass{background:rgba(255,255,255,.05);border:1px solid rgba(34,231,255,.28);border-radius:16px;
+  box-shadow:0 0 28px rgba(34,231,255,.12);backdrop-filter:blur(6px);padding:18px}
+.btn{cursor:pointer;border:none;padding:11px 20px;border-radius:12px;font-weight:700;font-size:14px;
+  color:#05172b;background:linear-gradient(135deg,var(--cyan),#8af2ff);box-shadow:0 0 16px rgba(34,231,255,.4)}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn.g{background:transparent;color:var(--text);border:1px solid rgba(34,231,255,.45);box-shadow:none}
+.btn.g:hover{background:rgba(34,231,255,.12)}
+.btn.v{background:linear-gradient(135deg,#7a5bff,#b07cff);color:#fff}
+.btn.y{background:linear-gradient(135deg,#ffd34d,#ff9a3c);color:#3b2400}
+.btn.r{background:linear-gradient(135deg,#ff5470,#ff8b9b);color:#fff}
+.btn.s{padding:7px 13px;font-size:12.5px;border-radius:9px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+.dim{color:var(--dim);font-size:12.5px;line-height:1.6}
+h1,h2,h3,h4{line-height:1.2}
+
+/* splash */
+#splash{gap:12px;text-align:center}
+.core{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fff,var(--cyan) 42%,var(--blue) 72%,transparent 80%);
+  box-shadow:0 0 42px var(--cyan);animation:pp 2.4s ease-in-out infinite}
+@keyframes pp{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.ttl{font-size:clamp(26px,5vw,50px);font-weight:900;letter-spacing:2px;
+  background:linear-gradient(90deg,#fff,var(--cyan) 45%,#b07cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{letter-spacing:5px;color:var(--dim);font-size:clamp(13px,2vw,18px);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:11px;max-width:880px;width:100%;margin-top:6px}
+.tile{padding:15px;border-radius:14px;cursor:pointer;text-align:left;border:1px solid rgba(34,231,255,.28);
+  background:linear-gradient(180deg,rgba(34,231,255,.09),rgba(155,92,255,.09));transition:transform .14s,box-shadow .2s}
+.tile:hover{transform:translateY(-3px);box-shadow:0 0 22px rgba(34,231,255,.38)}
+.tile h3{font-size:14.5px;color:var(--cyan);letter-spacing:.5px}
+.tile p{font-size:12px;color:var(--dim);margin-top:5px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;font-size:11.5px;
+  background:rgba(0,0,0,.35);border:1px solid rgba(34,231,255,.28)}
+.d{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.d.ok{background:var(--green);box-shadow:0 0 7px var(--green)}
+.d.wa{background:var(--yellow);box-shadow:0 0 7px var(--yellow)}
+.d.er{background:var(--red);box-shadow:0 0 7px var(--red)}
+
+/* game */
+#game{padding:0;justify-content:flex-start}
+.bar{width:100%;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;
+  padding:9px 14px;background:rgba(5,11,31,.92);border-bottom:1px solid rgba(34,231,255,.22)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;font-size:12.5px}
+.st{background:rgba(0,0,0,.4);border:1px solid rgba(34,231,255,.2);border-radius:8px;padding:5px 10px}
+.st b{color:var(--cyan)}
+#arena{position:relative;flex:1;width:100%;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.qbox{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:min(700px,92%);z-index:3;
+  padding:12px 16px;text-align:center;border-radius:14px;background:rgba(6,13,36,.92);border:1px solid rgba(34,231,255,.4)}
+.qmeta{font-size:10.5px;letter-spacing:2px;color:var(--dim);margin-bottom:5px}
+.qtext{font-size:clamp(13px,1.7vw,16.5px);font-weight:600;line-height:1.45}
+.hint{position:absolute;left:12px;bottom:10px;z-index:3;font-size:11.5px;color:var(--dim);
+  background:rgba(0,0,0,.45);border:1px solid rgba(34,231,255,.25);border-radius:9px;padding:6px 10px;max-width:46%}
+.alt{position:absolute;right:12px;bottom:10px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:52%}
+.alt button{cursor:pointer;border:1px solid rgba(34,231,255,.4);background:rgba(10,20,48,.85);color:var(--text);
+  border-radius:9px;padding:6px 10px;font-size:12px}
+.alt button:hover{background:rgba(34,231,255,.18)}
+.mini{position:absolute;right:12px;top:12px;width:150px;height:113px;border-radius:10px;overflow:hidden;z-index:3;
+  border:1px solid rgba(34,231,255,.35);background:#000;display:none}
+.mini video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.ov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
+  gap:12px;background:rgba(2,6,18,.9);z-index:9;text-align:center;padding:18px}
+.ov.on{display:flex}
+.ov h2{font-size:clamp(24px,4vw,38px);letter-spacing:1px}
+.ov p{max-width:620px;color:#cfe6ff;font-size:14px;line-height:1.55}
+
+/* panels */
+.card{max-width:900px;width:100%}
+.card h2{color:var(--cyan);letter-spacing:1.5px;font-size:19px}
+.card h3{color:var(--cyan);font-size:14.5px;margin:12px 0 5px}
+.card p,.card li{font-size:13px;color:#cfe6ff;line-height:1.65}
+.card ul{padding-left:19px}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:9px;margin-top:7px}
+.mi{padding:10px;border-radius:11px;background:rgba(34,231,255,.07);border:1px solid rgba(34,231,255,.2);font-size:12.5px;color:#cfe6ff}
+.mi b{display:block;color:var(--yellow);margin-bottom:3px;font-size:13px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* calibration */
+.cal{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start;max-width:1050px;width:100%}
+.vid{position:relative;width:min(460px,92vw);aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#05080f;border:1px solid rgba(34,231,255,.4)}
+.vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.vid canvas{position:absolute;inset:0;width:100%;height:100%}
+.vid .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:16px}
+.side{flex:1;min-width:265px;max-width:380px}
+.ir{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1)}
+.ir b{color:var(--cyan);font-weight:600;text-align:right}
+
+/* results */
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.rc{padding:12px;border-radius:11px;background:rgba(34,231,255,.07);border:1px solid rgba(34,231,255,.2)}
+.rc .l{font-size:10.5px;letter-spacing:1.5px;color:var(--dim)}
+.rc .v{font-size:23px;font-weight:800;color:var(--cyan);margin-top:3px}
+.badge{padding:6px 11px;border-radius:999px;font-size:11.5px;font-weight:800;color:#3b2400;
+  background:linear-gradient(135deg,#ffd34d,#ff9a3c)}
+.rev{max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-right:4px}
+.rv{padding:9px 11px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);font-size:12.5px;line-height:1.5}
+
+/* teacher */
+.inp{background:rgba(0,0,0,.42);color:#fff;border:1px solid rgba(34,231,255,.3);border-radius:8px;
+  padding:7px 9px;font-size:12.5px;font-family:inherit;width:100%}
+textarea.inp{min-height:52px;resize:vertical}
+.cfg{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1)}
+.cfg .inp{width:92px}
+.qitem{padding:10px;border-radius:11px;background:rgba(34,231,255,.05);border:1px solid rgba(34,231,255,.2);display:grid;gap:6px;margin-bottom:9px}
+.qitem label{font-size:11px;color:var(--dim)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.orow{display:flex;gap:6px;align-items:center}
+.orow input[type=radio]{width:16px;height:16px;flex:0 0 auto}
+.qlist{max-height:330px;overflow:auto;padding-right:5px;margin-top:8px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 16px;border-radius:10px;
+  background:rgba(0,0,0,.88);border:1px solid rgba(34,231,255,.35);font-size:13px;z-index:999;display:none;max-width:90%;text-align:center}
+@media(max-width:640px){.alt{max-width:100%;left:12px;justify-content:center}.hint{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ SPLASH ============ -->
+<section id="splash" class="screen on">
+  <div class="row" style="gap:14px">
+    <div class="core"></div>
+    <div style="text-align:left">
+      <div class="dim" style="letter-spacing:3px">MIND FORCE LAB</div>
+      <div class="ttl">TELEKINESIS QUIZ</div>
+      <div class="sub">MIND FORCE</div>
+    </div>
+  </div>
+  <div style="font-style:italic;color:#cfe6ff;font-size:14px;margin:4px 0 8px">
+    "Gerakkan Tanganmu, Kendalikan Energi, Taklukkan Tantangan!"
+  </div>
+  <div class="row">
+    <span class="chip"><i class="d ok"></i>Aplikasi siap</span>
+    <span class="chip"><i class="d" id="dMp"></i><span id="tMp">MediaPipe: belum dimuat</span></span>
+    <span class="chip"><i class="d" id="dCam"></i><span id="tCam">Kamera: nonaktif</span></span>
+  </div>
+
+  <div class="grid">
+    <div class="tile" data-nav="play-mouse"><h3>🖱️ MAIN (MODE MOUSE)</h3><p>Langsung bermain tanpa webcam.</p></div>
+    <div class="tile" data-nav="calib"><h3>🎯 MAIN (GESTURE TANGAN)</h3><p>Kalibrasi webcam lalu main pakai gerakan tangan.</p></div>
+    <div class="tile" data-nav="guide"><h3>✋ PANDUAN GESTURE</h3><p>Cara menggerakkan, menggenggam, dan konfirmasi.</p></div>
+    <div class="tile" data-nav="material"><h3>📘 MATERI ENERGI</h3><p>Ringkasan materi IPAS kelas VI.</p></div>
+    <div class="tile" data-nav="teacher"><h3>🧑‍🏫 MODE GURU</h3><p>Bank soal, pengaturan, rekap (PIN).</p></div>
+    <div class="tile" data-nav="reset-hint"><h3>🏆 REKOR SAYA</h3><p id="recText">Belum ada rekor.</p></div>
+  </div>
+
+  <p class="dim" style="max-width:700px;text-align:center;margin-top:10px">
+    Telekinesis di sini hanyalah tema permainan. Yang benar-benar bekerja adalah pelacakan gerakan tangan oleh kamera (MediaPipe),
+    diproses <b>di dalam browser</b> — tidak ada video yang direkam atau dikirim ke mana pun.
+    Webcam memerlukan <b>localhost</b> atau <b>HTTPS</b>.
+  </p>
+</section>
+
+<!-- ============ GAME ============ -->
+<section id="game" class="screen">
+  <div class="bar">
+    <div class="stats">
+      <span class="st">Skor <b id="sScore">0</b></span>
+      <span class="st">Benar <b id="sRight">0</b></span>
+      <span class="st">Streak <b id="sStreak">0</b></span>
+      <span class="st">Akurasi <b id="sAcc">0%</b></span>
+      <span class="st">Waktu <b id="sTime">45</b>s</span>
+      <span class="st">Soal <b id="sIdx">1</b>/<b id="sTot">10</b></span>
+      <span class="st">Kontrol <b id="sMode">Mouse</b></span>
+    </div>
+    <div class="row" style="gap:6px">
+      <button class="btn g s" id="bPause">⏸️ Jeda</button>
+      <button class="btn g s" id="bSound">🔊</button>
+      <button class="btn g s" id="bRestart">🔄 Ulang</button>
+      <button class="btn r s" id="bQuit">🚪 Selesai</button>
+    </div>
+  </div>
+
+  <div id="arena">
+    <canvas id="cv"></canvas>
+
+    <div class="qbox">
+      <div class="qmeta">MISI <span id="mName">-</span></div>
+      <div class="qtext" id="qText">-</div>
+    </div>
+
+    <div class="mini" id="mini"><video id="vGame" playsinline muted></video></div>
+    <div class="hint" id="hintBox">-</div>
+    <div class="alt" id="altBox"></div>
+
+    <div class="ov" id="fb">
+      <h2 id="fbT">BENAR</h2>
+      <p id="fbX">-</p>
+      <button class="btn" id="fbNext">Lanjut →</button>
+    </div>
+
+    <div class="ov" id="pz">
+      <h2 style="color:var(--cyan)">⏸️ JEDA</h2>
+      <div class="row">
+        <button class="btn" id="pzResume">▶️ Lanjutkan</button>
+        <button class="btn v" id="pzRestart">🔄 Mulai Ulang</button>
+        <button class="btn r" id="pzQuit">🚪 Selesai</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GUIDE ============ -->
+<section id="guide" class="screen">
+  <div class="glass card">
+    <div class="head"><h2>✋ PANDUAN GESTURE</h2><button class="btn g s" data-nav="splash">← Menu</button></div>
+    <div class="mg" style="margin-top:10px">
+      <div class="mi"><b>☝️ ARAHKAN (Move)</b>Angkat tangan, arahkan ujung telunjuk. Kursor energi mengikuti telunjuk.</div>
+      <div class="mi"><b>🤏 GENGGAM (Grab)</b>Satukan ujung ibu jari dan telunjuk (mencubit). Orb di dekat kursor akan terkunci.</div>
+      <div class="mi"><b>🫳 LEPAS (Release)</b>Buka kembali cubitan. Orb terlepas di posisi kursor.</div>
+      <div class="mi"><b>🖐️ DORONG (Push)</b>Buka telapak menghadap kamera. Orb di sekitar kursor terdorong menjauh.</div>
+      <div class="mi"><b>✊ TARIK (Pull)</b>Genggam orb lalu tarik ke INTI REAKTOR di tengah untuk menjawab.</div>
+      <div class="mi"><b>✅ KONFIRMASI</b>Tahan genggaman di atas orb ±0,8 detik sampai cincin penuh.</div>
+    </div>
+    <h3>Mode Mouse (tanpa webcam)</h3>
+    <p>Gerakkan mouse = arahkan kursor. <b>Tekan &amp; tahan tombol kiri</b> = genggam. <b>Lepas klik</b> = release.
+       Aturannya persis sama dengan mode gesture, jadi kamu bisa berpindah mode kapan saja.</p>
+    <h3>Tips supaya tangan terbaca</h3>
+    <ul>
+      <li>Jarak tangan 30–60 cm dari kamera, telapak menghadap kamera.</li>
+      <li>Cahaya ruangan cukup, hindari membelakangi jendela.</li>
+      <li>Jika tangan sempat hilang dari layar, objek tidak langsung terlepas (ada toleransi singkat).</li>
+    </ul>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" data-nav="calib">🎯 Coba Kalibrasi</button>
+      <button class="btn y" data-nav="play-mouse">🖱️ Main Mode Mouse</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MATERIAL ============ -->
+<section id="material" class="screen">
+  <div class="glass card">
+    <div class="head"><h2>📘 MATERI ENERGI — IPAS Kelas VI</h2><button class="btn g s" data-nav="splash">← Menu</button></div>
+    <h3>1. Pengertian Energi</h3>
+    <p>Energi adalah kemampuan untuk melakukan kerja atau menimbulkan perubahan. Energi <b>tidak dapat diciptakan maupun dimusnahkan</b>,
+       tetapi dapat <b>berubah bentuk</b> dan <b>berpindah</b> dari satu benda ke benda lain.</p>
+    <h3>2. Bentuk-bentuk Energi</h3>
+    <div class="mg">
+      <div class="mi"><b>Energi kinetik</b>Energi karena gerak: kipas berputar, sepeda melaju, angin bertiup.</div>
+      <div class="mi"><b>Energi potensial</b>Energi karena posisi/kedudukan: buah di pohon, air di bendungan.</div>
+      <div class="mi"><b>Energi panas</b>Berkaitan dengan suhu: api kompor, setrika, air mendidih.</div>
+      <div class="mi"><b>Energi cahaya</b>Dari sumber cahaya: matahari, lampu, senter.</div>
+      <div class="mi"><b>Energi bunyi</b>Dari getaran benda: speaker, gendang, suara kita.</div>
+      <div class="mi"><b>Energi listrik</b>Mengalir pada rangkaian: baterai, aki, listrik PLN.</div>
+      <div class="mi"><b>Energi kimia</b>Tersimpan dalam bahan: makanan, baterai, bahan bakar.</div>
+      <div class="mi"><b>Energi nuklir</b>Dari reaksi inti atom (PLTN).</div>
+    </div>
+    <h3>3. Perubahan Bentuk Energi</h3>
+    <ul>
+      <li>Senter: kimia (baterai) → listrik → cahaya + sebagian panas</li>
+      <li>Setrika: listrik → panas</li>
+      <li>Speaker: listrik → bunyi</li>
+      <li>Panel surya: cahaya → listrik</li>
+      <li>Kipas angin: listrik → gerak (kinetik)</li>
+      <li>Bersepeda: kimia (makanan) → kinetik</li>
+      <li>PLTA: potensial air → kinetik → listrik</li>
+    </ul>
+    <h3>4. Sumber Energi</h3>
+    <ul>
+      <li><b>Terbarukan:</b> matahari, angin, air, panas bumi, biomassa. Dapat tersedia kembali dalam waktu relatif singkat.</li>
+      <li><b>Tidak terbarukan:</b> minyak bumi, batu bara, gas alam. Terbentuk jutaan tahun sehingga jumlahnya terbatas.</li>
+    </ul>
+    <p class="dim">Catatan: energi terbarukan lebih ramah lingkungan, tetapi pembangunan infrastrukturnya
+       (misalnya bendungan besar atau ladang panel surya) tetap perlu memperhatikan dampak terhadap ekosistem.</p>
+    <h3>5. Hemat Energi di Rumah dan Sekolah</h3>
+    <ul>
+      <li>Mematikan lampu, kipas, dan proyektor saat tidak digunakan.</li>
+      <li>Mencabut pengisi daya setelah baterai penuh.</li>
+      <li>Memanfaatkan cahaya matahari pada siang hari.</li>
+      <li>Memilih lampu LED yang lebih banyak mengubah listrik menjadi cahaya daripada panas.</li>
+    </ul>
+    <div class="row" style="margin-top:12px">
+      <button class="btn y" data-nav="play-mouse">🖱️ Main Sekarang</button>
+      <button class="btn g" data-nav="splash">← Menu</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALIBRATION ============ -->
+<section id="calib" class="screen">
+  <div class="cal">
+    <div class="vid">
+      <video id="vCal" playsinline muted></video>
+      <canvas id="cCal"></canvas>
+      <div class="ph" id="calPh">Pratinjau webcam akan muncul di sini setelah kamera diaktifkan.</div>
+    </div>
+    <div class="glass side">
+      <div class="head"><h2 style="font-size:16px">🎯 KALIBRASI TANGAN</h2><button class="btn g s" data-nav="splash">← Menu</button></div>
+      <div style="margin-top:8px">
+        <div class="ir"><span>Izin kamera</span><b id="iCam">belum diminta</b></div>
+        <div class="ir"><span>Model MediaPipe</span><b id="iMp">belum dimuat</b></div>
+        <div class="ir"><span>Deteksi tangan</span><b id="iHand">—</b></div>
+        <div class="ir"><span>Gesture</span><b id="iGest">—</b></div>
+        <div class="ir"><span>Posisi telunjuk</span><b id="iPos">—</b></div>
+        <div class="ir"><span>Nilai cubit</span><b id="iPinch">—</b></div>
+      </div>
+      <p class="dim" style="margin-top:8px">
+        Gerakkan telunjuk ke empat sudut kotak pratinjau, lalu coba mencubit (ibu jari + telunjuk).
+        Titik kuning adalah ujung telunjuk. Jika status berubah menjadi <b>GENGGAM</b>, kalibrasi berhasil.
+      </p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn s" id="bCamOn">🎥 Aktifkan Kamera</button>
+        <button class="btn g s" id="bCamOff">⏹️ Matikan Kamera</button>
+      </div>
+      <div class="cfg" style="margin-top:10px"><span>Sensitivitas cubit</span>
+        <input class="inp" type="range" id="rPinch" min="0.20" max="0.75" step="0.01" style="width:120px"></div>
+      <div class="cfg"><span>Waktu konfirmasi</span>
+        <input class="inp" type="range" id="rHold" min="300" max="2000" step="50" style="width:120px"></div>
+      <p class="dim" id="calMsg" style="margin-top:8px">Kamera belum diaktifkan.</p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="bPlayHand" disabled>▶️ Main dengan Gesture</button>
+        <button class="btn y s" data-nav="play-mouse">🖱️ Main Mode Mouse</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section id="result" class="screen">
+  <div class="glass card" style="max-width:840px">
+    <div class="head"><h2>🏆 HASIL MISI</h2>
+      <div class="row" style="gap:6px">
+        <button class="btn g s" data-nav="splash">🏠 Menu</button>
+        <button class="btn g s" id="bRev">📝 Pembahasan</button>
+        <button class="btn s" id="bAgain">▶️ Main Lagi</button>
+      </div>
+    </div>
+    <div class="rg">
+      <div class="rc"><div class="l">SKOR</div><div class="v" id="rScore">0</div></div>
+      <div class="rc"><div class="l">BENAR</div><div class="v"><span id="rRight">0</span>/<span id="rTot">0</span></div></div>
+      <div class="rc"><div class="l">AKURASI</div><div class="v" id="rAcc">0%</div></div>
+      <div class="rc"><div class="l">WAKTU</div><div class="v" id="rTime">0s</div></div>
+      <div class="rc"><div class="l">STREAK TERBAIK</div><div class="v" id="rStreak">0</div></div>
+      <div class="rc"><div class="l">REKOR</div><div class="v" id="rBest">0</div></div>
+    </div>
+    <h3>Evaluasi</h3>
+    <p id="rEval">-</p>
+    <h3>Badge</h3>
+    <div class="row" id="rBadges" style="justify-content:flex-start"></div>
+    <div class="rev" id="revList" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ============ TEACHER ============ -->
+<section id="teacher" class="screen">
+  <!-- gate -->
+  <div class="glass" id="tGate" style="max-width:360px;width:92%;text-align:center">
+    <h2 style="color:var(--cyan);letter-spacing:1.5px">🧑‍🏫 MODE GURU</h2>
+    <p class="dim" style="margin:8px 0">Halaman ini khusus untuk guru.<br>
+      Masukkan PIN untuk membuka.<br>
+      <span style="font-size:11.5px">(pengunci antarmuka lokal, bukan sistem keamanan server)</span></p>
+    <div style="position:relative">
+      <input class="inp" type="password" id="pinInput" placeholder="Masukkan PIN"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+             inputmode="text" style="padding-right:42px;letter-spacing:3px;text-align:center">
+      <button type="button" id="pinEye" title="Tampilkan / sembunyikan PIN" aria-label="Tampilkan PIN"
+              style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;
+                     color:var(--dim);cursor:pointer;font-size:15px;padding:4px 6px;line-height:1">👁️</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="pinOk">🔓 Buka</button>
+      <button class="btn g" data-nav="splash">Batal</button>
+    </div>
+    <p id="pinMsg" style="color:var(--red);font-size:12.5px;margin-top:8px;min-height:16px"></p>
+  </div>
+
+  <!-- panel -->
+  <div class="glass card" id="tPanel" style="display:none;max-width:980px">
+    <div class="head">
+      <h2>🧑‍🏫 MODE GURU</h2>
+      <div class="row" style="gap:6px">
+        <button class="btn g s" id="bExport">📤 Ekspor JSON</button>
+        <button class="btn g s" id="bImport">📥 Impor JSON</button>
+        <button class="btn g s" id="bRestore">♻️ Soal Bawaan</button>
+        <button class="btn g s" data-nav="splash">← Keluar</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
+      <div class="glass" style="padding:12px">
+        <h3 style="margin-top:0">⚙️ Pengaturan Permainan</h3>
+        <div class="cfg"><span>Jumlah soal per sesi</span><input class="inp" type="number" id="cCount" min="3" max="50"></div>
+        <div class="cfg"><span>Durasi per soal (detik)</span><input class="inp" type="number" id="cTime" min="10" max="180"></div>
+        <div class="cfg"><span>Ambang cubit (0.2–0.75)</span><input class="inp" type="number" id="cPinch" min="0.2" max="0.75" step="0.01"></div>
+        <div class="cfg"><span>Waktu konfirmasi (ms)</span><input class="inp" type="number" id="cHold" min="300" max="2000" step="50"></div>
+        <div class="cfg"><span>Efek suara</span><input type="checkbox" id="cSfx"></div>
+        <div class="row" style="margin-top:10px;justify-content:flex-start">
+          <button class="btn s" id="bSaveCfg">💾 Simpan</button>
+          <button class="btn r s" id="bWipe">🗑️ Hapus Progres</button>
+        </div>
+      </div>
+      <div class="glass" style="padding:12px">
+        <h3 style="margin-top:0">📊 Rekap Sesi di Perangkat Ini</h3>
+        <div id="recap" style="max-height:230px;overflow:auto"></div>
+      </div>
+    </div>
+
+    <div class="glass" style="padding:12px;margin-top:12px">
+      <div class="head">
+        <h3 style="margin:0">📚 Bank Soal (<span id="qn">0</span>)</h3>
+        <button class="btn s" id="bAddQ">＋ Tambah Soal</button>
+      </div>
+      <div class="qlist" id="qlist"></div>
+    </div>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== UTIL ===================== */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+var toastT=null;
+function toast(msg,ms){
+  var t=$("toast"); t.textContent=msg; t.style.display="block";
+  clearTimeout(toastT); toastT=setTimeout(function(){ t.style.display="none"; }, ms||2300);
+}
+
+var LS={ q:"mf6.questions", cfg:"mf6.config", rec:"mf6.records", best:"mf6.best" };
+function load(key,def){ try{ var v=localStorage.getItem(key); return v==null?def:JSON.parse(v); }catch(e){ return def; } }
+function save(key,val){ try{ localStorage.setItem(key,JSON.stringify(val)); return true; }catch(e){ return false; } }
+
+/* ===================== BANK SOAL ===================== */
+var BANK=[
+ {q:"Sebuah senter menggunakan baterai untuk menghasilkan cahaya. Perubahan energi yang paling tepat adalah ...",
+  o:["Energi cahaya menjadi energi kimia saja","Energi kimia menjadi energi listrik, kemudian menjadi energi cahaya dan panas","Energi panas menjadi energi gerak saja","Energi bunyi menjadi energi listrik"],a:1,
+  e:"Baterai menyimpan energi kimia yang diubah menjadi energi listrik. Pada lampu senter, energi listrik berubah menjadi energi cahaya dan sebagian energi panas.",d:"sedang"},
+ {q:"Buah mangga yang masih tergantung di pohon memiliki energi ...",
+  o:["Energi kinetik","Energi potensial","Energi bunyi","Energi listrik"],a:1,
+  e:"Benda pada ketinggian tertentu menyimpan energi potensial gravitasi karena kedudukannya terhadap tanah.",d:"mudah"},
+ {q:"Kipas angin listrik yang sedang berputar menunjukkan perubahan energi ...",
+  o:["Listrik menjadi gerak","Gerak menjadi listrik","Cahaya menjadi panas","Bunyi menjadi listrik"],a:0,
+  e:"Motor pada kipas mengubah energi listrik menjadi energi gerak (kinetik) pada baling-baling.",d:"mudah"},
+ {q:"Setrika listrik terutama mengubah energi listrik menjadi energi ...",
+  o:["Cahaya","Bunyi","Panas","Kimia"],a:2,
+  e:"Elemen pemanas pada setrika mengubah energi listrik menjadi energi panas.",d:"mudah"},
+ {q:"Panel surya di atap sekolah bekerja dengan mengubah energi ...",
+  o:["Panas menjadi bunyi","Cahaya matahari menjadi energi listrik","Listrik menjadi cahaya","Kimia menjadi gerak"],a:1,
+  e:"Sel surya mengubah energi cahaya matahari menjadi energi listrik.",d:"sedang"},
+ {q:"Speaker yang sedang memutar lagu mengubah energi listrik menjadi energi ...",
+  o:["Bunyi","Cahaya","Kimia","Potensial"],a:0,
+  e:"Speaker menggetarkan membran sehingga energi listrik berubah menjadi energi bunyi.",d:"mudah"},
+ {q:"Pernyataan yang BENAR tentang energi adalah ...",
+  o:["Energi dapat diciptakan dari ketiadaan","Energi dapat dimusnahkan sepenuhnya","Energi dapat berubah bentuk dan berpindah","Energi selalu tetap pada satu bentuk"],a:2,
+  e:"Sesuai hukum kekekalan energi, energi tidak diciptakan atau dimusnahkan, tetapi dapat berubah bentuk dan berpindah.",d:"sedang"},
+ {q:"Kelompok sumber energi yang termasuk TIDAK terbarukan adalah ...",
+  o:["Matahari, angin, air","Minyak bumi, batu bara, gas alam","Panas bumi, biomassa, angin","Air, matahari, biogas"],a:1,
+  e:"Bahan bakar fosil terbentuk jutaan tahun sehingga tidak dapat diperbarui dalam waktu singkat.",d:"mudah"},
+ {q:"Pembangkit listrik tenaga air memanfaatkan urutan perubahan energi ...",
+  o:["Potensial air → kinetik → listrik","Bunyi → kinetik → listrik","Cahaya → panas → listrik","Kimia → bunyi → listrik"],a:0,
+  e:"Air pada ketinggian memiliki energi potensial, saat jatuh berubah menjadi kinetik yang memutar turbin dan generator menghasilkan listrik.",d:"menantang"},
+ {q:"Saat kita bersepeda, sumber energi utama yang digunakan tubuh berasal dari ...",
+  o:["Energi cahaya matahari langsung","Energi kimia pada makanan","Energi listrik dari baterai","Energi bunyi di sekitar"],a:1,
+  e:"Makanan menyimpan energi kimia yang diubah tubuh menjadi energi gerak (kinetik).",d:"sedang"},
+ {q:"Lampu pijar sering dianggap kurang hemat energi karena ...",
+  o:["Tidak menghasilkan cahaya sama sekali","Sebagian besar energi listrik berubah menjadi panas","Menghasilkan bunyi yang keras","Membutuhkan baterai khusus"],a:1,
+  e:"Pada lampu pijar, sebagian besar energi listrik berubah menjadi panas sehingga porsi yang menjadi cahaya lebih kecil.",d:"menantang"},
+ {q:"Kompor gas memanaskan air. Perubahan energi yang terjadi adalah ...",
+  o:["Listrik → panas","Kimia → panas","Bunyi → panas","Cahaya → kimia"],a:1,
+  e:"Gas yang terbakar melepaskan energi kimia menjadi energi panas yang memanaskan air.",d:"mudah"},
+ {q:"Dinamo pada sepeda membuat lampu menyala saat roda berputar. Perubahan energinya adalah ...",
+  o:["Kinetik → listrik → cahaya","Cahaya → listrik → kinetik","Kimia → bunyi → cahaya","Panas → kinetik → bunyi"],a:0,
+  e:"Putaran roda (kinetik) memutar dinamo menghasilkan listrik, lalu lampu mengubahnya menjadi cahaya.",d:"menantang"},
+ {q:"Contoh perilaku hemat energi di sekolah adalah ...",
+  o:["Membiarkan proyektor menyala saat istirahat","Menyalakan semua lampu di siang hari","Mematikan kipas saat kelas kosong","Membuka kulkas lama-lama"],a:2,
+  e:"Mematikan alat listrik yang tidak digunakan mengurangi energi yang terbuang sia-sia.",d:"mudah"},
+ {q:"Energi yang dimiliki benda karena gerakannya disebut energi ...",
+  o:["Potensial","Kinetik","Kimia","Nuklir"],a:1,
+  e:"Energi kinetik adalah energi yang dimiliki benda yang bergerak.",d:"mudah"},
+ {q:"Anak memukul gendang sehingga terdengar suara. Perubahan energi yang terjadi adalah ...",
+  o:["Kinetik → bunyi","Bunyi → cahaya","Listrik → bunyi","Panas → bunyi"],a:0,
+  e:"Gerakan tangan (kinetik) menggetarkan membran gendang sehingga sebagian energinya berubah menjadi bunyi.",d:"sedang"},
+ {q:"Mengapa sebaiknya mencabut pengisi daya ponsel setelah baterai penuh?",
+  o:["Agar baterai berubah menjadi energi cahaya","Agar energi listrik tidak terbuang menjadi panas sia-sia","Agar ponsel mengeluarkan bunyi","Agar listrik berpindah ke udara"],a:1,
+  e:"Pengisi daya yang tetap terpasang masih mengalirkan listrik yang sebagian berubah menjadi panas dan terbuang percuma.",d:"sedang"},
+ {q:"Perubahan energi pada mobil mainan bertenaga baterai adalah ...",
+  o:["Kimia → listrik → kinetik","Kinetik → kimia → cahaya","Cahaya → kimia → bunyi","Bunyi → listrik → panas"],a:0,
+  e:"Baterai (kimia) menghasilkan listrik yang memutar motor sehingga mobil bergerak (kinetik).",d:"sedang"},
+ {q:"Sumber energi yang paling berperan bagi kehidupan di Bumi adalah ...",
+  o:["Batu bara","Matahari","Minyak bumi","Gas alam"],a:1,
+  e:"Matahari menjadi sumber energi utama bagi proses fotosintesis, cuaca, dan banyak sumber energi lainnya.",d:"mudah"},
+ {q:"Kincir angin mengubah energi ... menjadi energi listrik.",
+  o:["Kinetik angin","Cahaya matahari","Bunyi","Kimia"],a:0,
+  e:"Angin yang bergerak memiliki energi kinetik yang memutar baling-baling dan generator menghasilkan listrik.",d:"sedang"},
+ {q:"Perhatikan: (1) air terjun, (2) bensin, (3) sinar matahari, (4) batu bara. Yang termasuk sumber energi terbarukan adalah ...",
+  o:["(1) dan (3)","(2) dan (4)","(1) dan (2)","(3) dan (4)"],a:0,
+  e:"Air terjun dan sinar matahari dapat tersedia kembali secara alami, sedangkan bensin dan batu bara berasal dari fosil.",d:"menantang"},
+ {q:"Lampu LED dianggap lebih hemat energi daripada lampu pijar karena ...",
+  o:["Lebih besar ukurannya","Porsi energi listrik yang menjadi cahaya lebih besar","Tidak memerlukan listrik","Menghasilkan bunyi lebih kecil"],a:1,
+  e:"LED mengubah lebih banyak energi listrik menjadi cahaya dan lebih sedikit terbuang sebagai panas.",d:"menantang"},
+ {q:"Termos air panas dirancang agar energi panas ...",
+  o:["Bertambah terus","Berubah menjadi listrik","Tidak cepat berpindah ke lingkungan","Berubah menjadi bunyi"],a:2,
+  e:"Termos memperlambat perpindahan panas sehingga air tetap hangat lebih lama.",d:"sedang"},
+ {q:"Saat bel listrik sekolah berbunyi, perubahan energinya adalah ...",
+  o:["Listrik → bunyi","Bunyi → listrik","Panas → bunyi","Cahaya → bunyi"],a:0,
+  e:"Bel listrik mengubah energi listrik menjadi getaran yang terdengar sebagai bunyi.",d:"mudah"},
+ {q:"Seorang siswa menjatuhkan bola dari meja. Saat bola jatuh, energi potensial bola ...",
+  o:["Berubah menjadi energi kinetik","Berubah menjadi energi kimia","Hilang sama sekali","Bertambah besar"],a:0,
+  e:"Semakin rendah posisi bola, energi potensialnya berkurang dan berubah menjadi energi kinetik (gerak).",d:"sedang"},
+ {q:"Alat yang mengubah energi listrik menjadi energi cahaya DAN panas sekaligus adalah ...",
+  o:["Kipas angin","Lampu pijar","Mesin cuci","Radio"],a:1,
+  e:"Lampu pijar menghasilkan cahaya sekaligus panas yang cukup terasa.",d:"sedang"},
+ {q:"Pernyataan yang TIDAK tepat tentang energi terbarukan adalah ...",
+  o:["Dapat tersedia kembali secara alami","Contohnya angin dan matahari","Sama sekali tidak berdampak pada lingkungan","Dapat dimanfaatkan untuk pembangkit listrik"],a:2,
+  e:"Energi terbarukan lebih ramah lingkungan, tetapi pembangunan infrastrukturnya tetap dapat berdampak pada ekosistem sehingga perlu dikelola dengan baik.",d:"menantang"},
+ {q:"Blender mengubah energi listrik menjadi energi gerak. Energi lain yang ikut muncul sebagai pengiring adalah ...",
+  o:["Energi bunyi dan panas","Energi nuklir","Energi potensial","Energi kimia"],a:0,
+  e:"Selain gerak, blender menimbulkan bunyi dan sedikit panas karena tidak seluruh energi berubah menjadi gerak.",d:"menantang"},
+ {q:"Pada siang hari, membuka tirai jendela agar ruangan terang termasuk upaya ...",
+  o:["Memboroskan energi","Menghemat energi listrik","Menciptakan energi baru","Memusnahkan energi"],a:1,
+  e:"Memanfaatkan cahaya matahari mengurangi penggunaan lampu sehingga menghemat energi listrik.",d:"mudah"},
+ {q:"Aki pada mobil menyalakan lampu depan. Urutan perubahan energinya adalah ...",
+  o:["Kimia → listrik → cahaya","Cahaya → kimia → listrik","Listrik → kimia → panas","Kinetik → listrik → kimia"],a:0,
+  e:"Aki menyimpan energi kimia, diubah menjadi listrik, lalu lampu mengubahnya menjadi cahaya.",d:"sedang"},
+ {q:"Ketika kita menggosok-gosokkan kedua telapak tangan, tangan terasa hangat. Hal ini menunjukkan perubahan energi ...",
+  o:["Kinetik menjadi panas","Panas menjadi kinetik","Cahaya menjadi panas","Bunyi menjadi panas"],a:0,
+  e:"Gerakan menggosok (kinetik) dan gesekan mengubah sebagian energi gerak menjadi energi panas.",d:"sedang"},
+ {q:"Perhatikan rantai energi: makanan → otot bergerak → mendorong gerobak. Bentuk energi awal pada rantai tersebut adalah ...",
+  o:["Energi kimia","Energi listrik","Energi bunyi","Energi cahaya"],a:0,
+  e:"Makanan menyimpan energi kimia yang diubah tubuh menjadi energi gerak untuk mendorong gerobak.",d:"menantang"}
+];
+
+/* ===================== CONFIG ===================== */
+var CFG = { count:10, time:45, pinch:0.42, hold:800, sfx:true };
+(function initCfg(){
+  var s=load(LS.cfg,null);
+  if(s&&typeof s==="object"){
+    if(typeof s.count==="number") CFG.count=clamp(s.count,3,50);
+    if(typeof s.time==="number") CFG.time=clamp(s.time,10,180);
+    if(typeof s.pinch==="number") CFG.pinch=clamp(s.pinch,0.2,0.75);
+    if(typeof s.hold==="number") CFG.hold=clamp(s.hold,300,2000);
+    if(typeof s.sfx==="boolean") CFG.sfx=s.sfx;
+  }
+})();
+function saveCfg(){ save(LS.cfg,CFG); }
+
+function getBank(){
+  var a=load(LS.q,null);
+  if(!a||!a.length) return BANK.slice();
+  var ok=[];
+  for(var i=0;i<a.length;i++){
+    var q=a[i];
+    if(q&&typeof q.q==="string"&&q.q.trim()&&Array.isArray(q.o)&&q.o.length===4&&
+       typeof q.a==="number"&&q.a>=0&&q.a<=3&&typeof q.e==="string") ok.push(q);
+  }
+  return ok.length?ok:BANK.slice();
+}
+
+/* ===================== AUDIO ===================== */
+var AC=null;
+function beep(f,dur,type,vol){
+  if(!CFG.sfx) return;
+  try{
+    if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    var o=AC.createOscillator(), g=AC.createGain();
+    o.type=type||"sine"; o.frequency.value=f;
+    g.gain.setValueAtTime(vol||0.06, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+(dur||0.12));
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime+(dur||0.12)+0.02);
+  }catch(e){}
+}
+function sfx(n){
+  if(n==="grab") beep(620,0.08,"square",0.05);
+  else if(n==="drop") beep(880,0.09,"triangle",0.05);
+  else if(n==="ok"){ beep(880,0.1,"triangle",0.06); setTimeout(function(){beep(1320,0.14,"triangle",0.06);},90); }
+  else if(n==="no"){ beep(240,0.16,"square",0.05); setTimeout(function(){beep(170,0.2,"square",0.05);},110); }
+  else if(n==="done"){ beep(660,0.1,"sine",0.06); setTimeout(function(){beep(880,0.1,"sine",0.06);},110); setTimeout(function(){beep(1320,0.18,"sine",0.06);},220); }
+  else if(n==="tick") beep(900,0.04,"square",0.025);
+}
+
+/* ===================== NAVIGATION ===================== */
+var SCREENS=["splash","game","guide","material","calib","result","teacher"];
+var current="splash";
+function go(name){
+  if(name==="play-mouse"){ startGame("mouse"); return; }
+  if(name==="play-hand"){ startGame("hand"); return; }
+  if(name==="reset-hint"){ toast("Rekor tersimpan di perangkat ini. Hapus lewat Mode Guru."); return; }
+  if(SCREENS.indexOf(name)<0) return;
+  for(var i=0;i<SCREENS.length;i++){
+    var s=$(SCREENS[i]); if(s) s.classList.toggle("on", SCREENS[i]===name);
+  }
+  current=name;
+  if(name==="teacher"){
+    $("tGate").style.display="block"; $("tPanel").style.display="none";
+    var pb=$("pinInput"); pb.value=""; pb.type="password";
+    var pe=$("pinEye"); if(pe){ pe.textContent="👁️"; pe.setAttribute("aria-label","Tampilkan PIN"); }
+    $("pinMsg").textContent="";
+    setTimeout(function(){ pb.focus(); },60);
+  }
+  if(name==="calib"){ syncCalInputs(); }
+  if(name!=="game" && G.timer){ clearInterval(G.timer); G.timer=null; }
+  if(name!=="calib" && name!=="game"){ /* kamera tetap jalan hanya bila dipakai */ }
+}
+document.addEventListener("click", function(ev){
+  var t=ev.target;
+  while(t && t!==document.body){
+    if(t.getAttribute && t.getAttribute("data-nav")){ go(t.getAttribute("data-nav")); return; }
+    t=t.parentNode;
+  }
+});
+
+/* ===================== GAME STATE ===================== */
+var G={
+  mode:"mouse", list:[], idx:0, score:0, right:0, answered:0, streak:0, best:0,
+  t:45, timer:null, paused:false, locked:false, started:0, history:[],
+  orbs:[], core:{x:0,y:0,r:62}, cursor:{x:0,y:0}, grab:{on:false,orb:null,hold:0},
+  particles:[], waves:[], mission:"REACTOR", lastTs:0
+};
+var CV=$("cv"), CTX=CV.getContext("2d");
+
+function fitCanvas(){
+  var r=$("arena").getBoundingClientRect();
+  var dpr=window.devicePixelRatio||1;
+  CV.width=Math.max(320,Math.floor(r.width*dpr));
+  CV.height=Math.max(240,Math.floor(r.height*dpr));
+  CTX.setTransform(dpr,0,0,dpr,0,0);
+  G.W=r.width; G.H=r.height;
+  G.core.x=G.W/2; G.core.y=G.H*0.52; G.core.r=Math.max(46,Math.min(78,G.W*0.07));
+}
+window.addEventListener("resize", function(){ if(current==="game"){ fitCanvas(); layoutOrbs(); } });
+
+var MISSIONS=[
+  {k:"REACTOR", n:"POWER REACTOR", h:"Arahkan kursor ke orb jawaban, lalu GENGGAM dan tahan sampai cincin penuh."},
+  {k:"PULL",    n:"ENERGY PULL",   h:"Genggam orb jawaban yang benar, lalu TARIK ke INTI REAKTOR di tengah dan lepaskan."},
+  {k:"ORBIT",   n:"ORBIT CONTROL", h:"Orb mengorbit inti. Kejar orb yang benar, genggam, dan tahan sampai cincin penuh."},
+  {k:"SORT",    n:"ENERGY SORTING",h:"Seret orb jawaban yang benar ke INTI REAKTOR untuk memilah energi."},
+  {k:"DRIFT",   n:"FLOATING ORB",  h:"Orb melayang bebas. Genggam orb yang benar lalu tahan sampai cincin penuh."}
+];
+
+function startGame(mode){
+  G.mode = (mode==="hand" && HAND.ready && CAMERA.stream) ? "hand" : "mouse";
+  var bank=getBank();
+  var n=Math.min(CFG.count, bank.length);
+  var order=[]; for(var i=0;i<bank.length;i++) order.push(i);
+  shuffle(order);
+  G.list=[]; for(var k=0;k<n;k++) G.list.push(bank[order[k]]);
+  G.idx=0; G.score=0; G.right=0; G.answered=0; G.streak=0; G.best=0;
+  G.history=[]; G.paused=false; G.locked=false; G.started=Date.now();
+  G.particles=[]; G.waves=[];
+  $("sMode").textContent = G.mode==="hand" ? "Gesture" : "Mouse";
+  $("mini").style.display = G.mode==="hand" ? "block" : "none";
+  if(G.mode==="hand" && CAMERA.stream){ var vg=$("vGame"); if(vg.srcObject!==CAMERA.stream){ vg.srcObject=CAMERA.stream; vg.play().catch(function(){}); } }
+  go("game");
+  fitCanvas();
+  G.cursor.x=G.W/2; G.cursor.y=G.H/2;
+  loadQuestion();
+}
+
+function loadQuestion(){
+  if(G.idx>=G.list.length){ finishGame(); return; }
+  var q=G.list[G.idx];
+  // acak opsi, kunci tetap benar
+  var pair=[]; for(var i=0;i<4;i++) pair.push({t:q.o[i], correct:(i===q.a)});
+  shuffle(pair);
+  G.q=q; G.opts=pair;
+  G.correctIdx=-1; for(var j=0;j<4;j++) if(pair[j].correct) G.correctIdx=j;
+
+  var m=MISSIONS[G.idx % MISSIONS.length];
+  G.mission=m.k;
+  $("mName").textContent=m.n;
+  $("hintBox").textContent=(G.mode==="hand"?"🖐️ ":"🖱️ ")+m.h;
+  $("qText").textContent=q.q;
+  $("sIdx").textContent=(G.idx+1); $("sTot").textContent=G.list.length;
+
+  // buat orbs
+  var pal=["#22e7ff","#ffd34d","#9b5cff","#3df58a"];
+  var lab=["A","B","C","D"];
+  G.orbs=[];
+  for(var o=0;o<4;o++){
+    G.orbs.push({ i:o, label:lab[o], text:pair[o].t, col:pal[o],
+      x:0,y:0, vx:0, vy:0, r:Math.max(34,Math.min(52,(G.W||800)*0.045)),
+      ang:(Math.PI*2/4)*o, held:false, done:false });
+  }
+  layoutOrbs();
+
+  // tombol alternatif (aksesibilitas)
+  var box=$("altBox"); box.innerHTML="";
+  for(var b=0;b<4;b++){
+    (function(ix){
+      var btn=el("button",null, lab[ix]+". "+esc(pair[ix].t.length>26?pair[ix].t.slice(0,25)+"…":pair[ix].t));
+      btn.title=pair[ix].t;
+      btn.onclick=function(){ answer(ix,"tombol"); };
+      box.appendChild(btn);
+    })(b);
+  }
+
+  G.locked=false; G.grab.on=false; G.grab.orb=null; G.grab.hold=0;
+  $("fb").classList.remove("on");
+  G.t=CFG.time; $("sTime").textContent=G.t;
+  refreshStats();
+  if(G.timer) clearInterval(G.timer);
+  G.timer=setInterval(function(){
+    if(G.paused||G.locked) return;
+    G.t--; $("sTime").textContent=G.t;
+    if(G.t<=5&&G.t>0) sfx("tick");
+    if(G.t<=0){ clearInterval(G.timer); G.timer=null; answer(-1,"waktu"); }
+  },1000);
+}
+
+function layoutOrbs(){
+  if(!G.orbs||!G.orbs.length||!G.W) return;
+  var m=G.mission;
+  for(var i=0;i<4;i++){
+    var o=G.orbs[i];
+    o.r=Math.max(32,Math.min(52,G.W*0.045));
+    if(m==="REACTOR"||m==="PULL"||m==="SORT"){
+      var gap=G.W/5;
+      o.x=gap*(i+1); o.y=G.H*0.3;
+      if(m!=="REACTOR"){ o.y=G.H*0.26; }
+      o.vx=0; o.vy=0;
+    } else if(m==="ORBIT"){
+      o.ang=(Math.PI*2/4)*i;
+      var R=Math.min(G.W,G.H)*0.3;
+      o.x=G.core.x+Math.cos(o.ang)*R; o.y=G.core.y+Math.sin(o.ang)*R;
+    } else { // DRIFT
+      o.x=G.W*(0.2+0.2*i); o.y=G.H*(0.3+(i%2)*0.2);
+      o.vx=(Math.random()*2-1)*0.5; o.vy=(Math.random()*2-1)*0.5;
+    }
+  }
+}
+
+function refreshStats(){
+  $("sScore").textContent=G.score;
+  $("sRight").textContent=G.right;
+  $("sStreak").textContent=G.streak;
+  $("sAcc").textContent=(G.answered? Math.round(G.right/G.answered*100):0)+"%";
+}
+
+function answer(i, via){
+  if(G.locked) return;
+  G.locked=true;
+  if(G.timer){ clearInterval(G.timer); G.timer=null; }
+  var ok = (i===G.correctIdx);
+  G.answered++;
+  var gained=0;
+  if(ok){
+    G.right++; G.streak++;
+    if(G.streak>G.best) G.best=G.streak;
+    gained=100;
+    if(via==="gesture") gained+=50;              // bonus menyelesaikan dengan gesture
+    gained+=Math.min(30, Math.max(0, Math.round(G.t*0.5)));  // bonus waktu terbatas
+    G.score+=gained;
+    sfx("ok");
+    burst(G.orbs[i]?G.orbs[i].x:G.core.x, G.orbs[i]?G.orbs[i].y:G.core.y, "#3df58a", 48);
+    wave(G.core.x,G.core.y,"#3df58a");
+  }else{
+    G.streak=0; sfx("no");
+    var src = (i>=0&&G.orbs[i])?G.orbs[i]:{x:G.core.x,y:G.core.y};
+    burst(src.x,src.y,"#ff5470",30);
+  }
+  for(var k=0;k<G.orbs.length;k++){ G.orbs[k].done=true; G.orbs[k].correct=(k===G.correctIdx); G.orbs[k].picked=(k===i); }
+  G.history.push({ q:G.q.q, your:(i>=0?G.opts[i].t:"(tidak dijawab)"), key:G.opts[G.correctIdx].t, ok:ok, e:G.q.e });
+  refreshStats();
+  $("fbT").textContent = ok ? ("✓ BENAR  +"+gained) : (via==="waktu" ? "⏰ WAKTU HABIS" : "✗ KURANG TEPAT");
+  $("fbT").style.color = ok ? "var(--green)" : "var(--red)";
+  $("fbX").textContent = (ok?"":"Jawaban benar: "+G.opts[G.correctIdx].t+". ")+G.q.e;
+  setTimeout(function(){ $("fb").classList.add("on"); }, 420);
+}
+
+$("fbNext").onclick=function(){ $("fb").classList.remove("on"); G.idx++; loadQuestion(); };
+
+function finishGame(){
+  if(G.timer){ clearInterval(G.timer); G.timer=null; }
+  sfx("done");
+  var secs=Math.max(1,Math.round((Date.now()-G.started)/1000));
+  var acc=G.answered?Math.round(G.right/G.answered*100):0;
+  var best=load(LS.best,0); if(G.score>best){ best=G.score; save(LS.best,best); }
+  $("rScore").textContent=G.score; $("rRight").textContent=G.right; $("rTot").textContent=G.answered;
+  $("rAcc").textContent=acc+"%"; $("rTime").textContent=secs+"s";
+  $("rStreak").textContent=G.best; $("rBest").textContent=best;
+  $("rEval").textContent = acc>=85 ? "Luar biasa! Pemahamanmu tentang bentuk dan perubahan energi sudah sangat baik. Coba tantang dirimu dengan jumlah soal lebih banyak."
+    : acc>=60 ? "Bagus! Sebagian besar konsep sudah kamu kuasai. Perdalam lagi bagian perubahan bentuk energi dan sumber energi terbarukan."
+    : "Terus berlatih! Baca kembali halaman Materi Energi, terutama bentuk-bentuk energi dan contoh perubahannya, lalu ulangi misi.";
+  var bd=$("rBadges"); bd.innerHTML="";
+  var badges=[];
+  if(acc===100&&G.answered>0) badges.push("🏆 Sempurna");
+  if(G.best>=5) badges.push("🔥 Streak 5");
+  if(G.best>=8) badges.push("⚡ Streak 8");
+  if(G.mode==="hand") badges.push("🖐️ Pengendali Gesture");
+  if(acc>=80) badges.push("🎓 Ahli Energi");
+  if(!badges.length) badges.push("🌱 Pemula Semangat");
+  for(var i=0;i<badges.length;i++) bd.appendChild(el("span","badge",badges[i]));
+  var recs=load(LS.rec,[]);
+  recs.unshift({ d:new Date().toISOString(), s:G.score, r:G.right, t:G.answered, sec:secs, mode:G.mode });
+  save(LS.rec, recs.slice(0,40));
+  $("revList").style.display="none"; $("revList").innerHTML="";
+  go("result");
+  updateRecordLabel();
+}
+
+$("bRev").onclick=function(){
+  var box=$("revList");
+  if(box.style.display==="flex"){ box.style.display="none"; return; }
+  box.innerHTML="";
+  if(!G.history.length){ box.appendChild(el("div","rv","Belum ada soal yang dijawab.")); }
+  for(var i=0;i<G.history.length;i++){
+    var h=G.history[i];
+    box.appendChild(el("div","rv",
+      '<b style="color:'+(h.ok?"var(--green)":"var(--red)")+'">'+(i+1)+". "+(h.ok?"BENAR":"KURANG TEPAT")+'</b><br>'+
+      esc(h.q)+'<br><span class="dim">Jawabanmu: '+esc(h.your)+'</span><br>'+
+      '<span style="color:var(--green)">Kunci: '+esc(h.key)+'</span><br>'+
+      '<span class="dim">'+esc(h.e)+'</span>'));
+  }
+  box.style.display="flex";
+};
+$("bAgain").onclick=function(){ startGame(G.mode); };
+$("bRestart").onclick=function(){ if(confirm("Mulai ulang misi dari awal?")) startGame(G.mode); };
+$("pzRestart").onclick=function(){ $("pz").classList.remove("on"); G.paused=false; startGame(G.mode); };
+$("bQuit").onclick=function(){ if(confirm("Akhiri misi dan lihat hasil?")) finishGame(); };
+$("pzQuit").onclick=function(){ $("pz").classList.remove("on"); G.paused=false; finishGame(); };
+$("bPause").onclick=function(){ G.paused=true; $("pz").classList.add("on"); };
+$("pzResume").onclick=function(){ G.paused=false; $("pz").classList.remove("on"); };
+$("bSound").onclick=function(){ CFG.sfx=!CFG.sfx; saveCfg(); $("bSound").textContent=CFG.sfx?"🔊":"🔇"; toast(CFG.sfx?"Suara aktif":"Suara dimatikan"); };
+
+/* ===================== EFEK ===================== */
+function burst(x,y,col,n){
+  for(var i=0;i<(n||24);i++){
+    var a=Math.random()*Math.PI*2, s=1+Math.random()*4;
+    G.particles.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,col:col,r:1.5+Math.random()*2.5});
+  }
+  if(G.particles.length>420) G.particles.splice(0,G.particles.length-420);
+}
+function wave(x,y,col){ G.waves.push({x:x,y:y,r:8,col:col,life:1}); }
+
+/* ===================== INTERAKSI ===================== */
+function pointerInside(ev){
+  var r=$("arena").getBoundingClientRect();
+  return { x:ev.clientX-r.left, y:ev.clientY-r.top };
+}
+$("arena").addEventListener("mousemove", function(ev){
+  if(G.mode!=="mouse") return;
+  var p=pointerInside(ev); G.cursor.x=p.x; G.cursor.y=p.y;
+});
+$("arena").addEventListener("mousedown", function(ev){
+  if(G.mode!=="mouse"||G.paused||G.locked) return;
+  var p=pointerInside(ev); G.cursor.x=p.x; G.cursor.y=p.y;
+  doGrab();
+});
+window.addEventListener("mouseup", function(){
+  if(G.mode!=="mouse") return;
+  doRelease();
+});
+$("arena").addEventListener("touchmove", function(ev){
+  if(G.mode!=="mouse") return;
+  var t=ev.touches[0]; if(!t) return;
+  var r=$("arena").getBoundingClientRect();
+  G.cursor.x=t.clientX-r.left; G.cursor.y=t.clientY-r.top;
+  ev.preventDefault();
+},{passive:false});
+$("arena").addEventListener("touchstart", function(ev){
+  if(G.mode!=="mouse"||G.paused||G.locked) return;
+  var t=ev.touches[0]; if(!t) return;
+  var r=$("arena").getBoundingClientRect();
+  G.cursor.x=t.clientX-r.left; G.cursor.y=t.clientY-r.top;
+  doGrab(); ev.preventDefault();
+},{passive:false});
+$("arena").addEventListener("touchend", function(ev){ if(G.mode==="mouse"){ doRelease(); ev.preventDefault(); } },{passive:false});
+
+function orbAt(x,y){
+  for(var i=0;i<G.orbs.length;i++){
+    var o=G.orbs[i];
+    if(Math.hypot(x-o.x,y-o.y) <= o.r+12) return o;
+  }
+  return null;
+}
+function doGrab(){
+  if(G.locked||G.paused||G.grab.on) return;
+  var o=orbAt(G.cursor.x,G.cursor.y);
+  if(!o) return;
+  G.grab.on=true; G.grab.orb=o; G.grab.hold=0; o.held=true;
+  sfx("grab");
+  burst(o.x,o.y,o.col,14);
+}
+function doRelease(){
+  if(!G.grab.on) return;
+  var o=G.grab.orb;
+  G.grab.on=false; G.grab.hold=0;
+  if(o){
+    o.held=false;
+    sfx("drop"); wave(o.x,o.y,o.col);
+    // misi PULL / SORT: lepas di inti = jawab
+    if((G.mission==="PULL"||G.mission==="SORT") && !G.locked){
+      if(Math.hypot(o.x-G.core.x,o.y-G.core.y) <= G.core.r+o.r*0.6){
+        answer(o.i,"gesture"); G.grab.orb=null; return;
+      } else {
+        toast("Bawa orb ke INTI REAKTOR di tengah lalu lepaskan.");
+      }
+    }
+  }
+  G.grab.orb=null;
+}
+function pushAway(){
+  // gesture PUSH: dorong orb menjauh dari kursor
+  for(var i=0;i<G.orbs.length;i++){
+    var o=G.orbs[i]; if(o.held) continue;
+    var dx=o.x-G.cursor.x, dy=o.y-G.cursor.y, d=Math.hypot(dx,dy);
+    if(d<160&&d>0.01){ o.vx+=(dx/d)*1.6; o.vy+=(dy/d)*1.6; }
+  }
+}
+
+/* ===================== LOOP RENDER ===================== */
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(current!=="game"){ return; }
+  if(!G.W) fitCanvas();
+  var dt=Math.min(40, ts-(G.lastTs||ts)); G.lastTs=ts;
+
+  if(!G.paused) updatePhysics(dt);
+  draw();
+}
+function updatePhysics(dt){
+  var i,o;
+  // orbit / drift
+  if(G.mission==="ORBIT"){
+    var R=Math.min(G.W,G.H)*0.3;
+    for(i=0;i<G.orbs.length;i++){
+      o=G.orbs[i];
+      if(o.held||G.locked) continue;
+      o.ang+=0.0006*dt;
+      o.x=G.core.x+Math.cos(o.ang)*R;
+      o.y=G.core.y+Math.sin(o.ang)*R;
+    }
+  } else if(G.mission==="DRIFT"){
+    for(i=0;i<G.orbs.length;i++){
+      o=G.orbs[i];
+      if(o.held) continue;
+      o.x+=o.vx*dt*0.06; o.y+=o.vy*dt*0.06;
+      var pad=o.r+6;
+      if(o.x<pad){o.x=pad;o.vx=Math.abs(o.vx);} if(o.x>G.W-pad){o.x=G.W-pad;o.vx=-Math.abs(o.vx);}
+      if(o.y<G.H*0.2){o.y=G.H*0.2;o.vy=Math.abs(o.vy);} if(o.y>G.H-pad-40){o.y=G.H-pad-40;o.vy=-Math.abs(o.vy);}
+      o.vx*=0.995; o.vy*=0.995;
+    }
+  } else {
+    for(i=0;i<G.orbs.length;i++){
+      o=G.orbs[i];
+      if(o.held) continue;
+      if(Math.abs(o.vx)>0.01||Math.abs(o.vy)>0.01){
+        o.x+=o.vx*dt*0.06; o.y+=o.vy*dt*0.06; o.vx*=0.94; o.vy*=0.94;
+        var p2=o.r+6;
+        o.x=clamp(o.x,p2,G.W-p2); o.y=clamp(o.y,G.H*0.2,G.H-p2-40);
+      }
+    }
+  }
+  // orb tergenggam mengikuti kursor
+  if(G.grab.on&&G.grab.orb){
+    var g=G.grab.orb;
+    g.x+=(G.cursor.x-g.x)*0.35; g.y+=(G.cursor.y-g.y)*0.35;
+    // hold-to-confirm hanya untuk misi non-tarik
+    if(G.mission!=="PULL"&&G.mission!=="SORT"&&!G.locked){
+      G.grab.hold+=dt;
+      if(G.grab.hold>=CFG.hold){
+        var idx=g.i; G.grab.on=false; g.held=false; G.grab.orb=null; G.grab.hold=0;
+        answer(idx, G.mode==="hand"?"gesture":"mouse");
+      }
+    }
+  } else { G.grab.hold=0; }
+
+  // partikel
+  for(i=G.particles.length-1;i>=0;i--){
+    var p=G.particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.04; p.life-=0.018;
+    if(p.life<=0) G.particles.splice(i,1);
+  }
+  for(i=G.waves.length-1;i>=0;i--){
+    var w=G.waves[i]; w.r+=4; w.life-=0.02;
+    if(w.life<=0) G.waves.splice(i,1);
+  }
+}
+
+function draw(){
+  var W=G.W,H=G.H,c=CTX;
+  c.clearRect(0,0,W,H);
+
+  // latar grid
+  c.strokeStyle="rgba(34,231,255,0.07)"; c.lineWidth=1;
+  var step=46;
+  for(var x=(performance.now()/60)%step; x<W; x+=step){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,H); c.stroke(); }
+  for(var y=0;y<H;y+=step){ c.beginPath(); c.moveTo(0,y); c.lineTo(W,y); c.stroke(); }
+
+  // inti reaktor (target misi PULL/SORT)
+  var needCore=(G.mission==="PULL"||G.mission==="SORT"||G.mission==="ORBIT");
+  if(needCore){
+    var pulse=1+Math.sin(performance.now()/420)*0.05;
+    var cr=G.core.r*pulse;
+    var gr=c.createRadialGradient(G.core.x,G.core.y,4,G.core.x,G.core.y,cr*1.6);
+    gr.addColorStop(0,"rgba(255,255,255,0.9)");
+    gr.addColorStop(0.35,"rgba(34,231,255,0.45)");
+    gr.addColorStop(1,"rgba(34,231,255,0)");
+    c.fillStyle=gr; c.beginPath(); c.arc(G.core.x,G.core.y,cr*1.6,0,6.2832); c.fill();
+    c.strokeStyle="rgba(34,231,255,0.85)"; c.lineWidth=2;
+    c.setLineDash([7,7]); c.lineDashOffset=-performance.now()/50;
+    c.beginPath(); c.arc(G.core.x,G.core.y,cr,0,6.2832); c.stroke(); c.setLineDash([]);
+    c.fillStyle="rgba(234,246,255,0.85)"; c.font="600 11px Segoe UI"; c.textAlign="center";
+    c.fillText("INTI REAKTOR", G.core.x, G.core.y+cr+16);
+  }
+
+  // gelombang
+  for(var i=0;i<G.waves.length;i++){
+    var w=G.waves[i];
+    c.strokeStyle=hexA(w.col,w.life*0.8); c.lineWidth=2;
+    c.beginPath(); c.arc(w.x,w.y,w.r,0,6.2832); c.stroke();
+  }
+
+  // orbs
+  for(i=0;i<G.orbs.length;i++) drawOrb(c,G.orbs[i]);
+
+  // sinar genggam
+  if(G.grab.on&&G.grab.orb){
+    c.strokeStyle="rgba(255,211,77,0.85)"; c.lineWidth=2;
+    c.setLineDash([6,6]); c.lineDashOffset=-performance.now()/40;
+    c.beginPath(); c.moveTo(G.cursor.x,G.cursor.y); c.lineTo(G.grab.orb.x,G.grab.orb.y); c.stroke(); c.setLineDash([]);
+  }
+
+  // partikel
+  for(i=0;i<G.particles.length;i++){
+    var p=G.particles[i];
+    c.fillStyle=hexA(p.col,Math.max(0,p.life));
+    c.beginPath(); c.arc(p.x,p.y,p.r,0,6.2832); c.fill();
+  }
+
+  // kursor telekinesis
+  drawCursor(c);
+}
+
+function drawOrb(c,o){
+  var r=o.r;
+  var col=o.col;
+  if(o.done) col = o.correct ? "#3df58a" : (o.picked ? "#ff5470" : "#51607d");
+  var hov = !o.done && Math.hypot(G.cursor.x-o.x,G.cursor.y-o.y)<=r+12;
+  var glow=c.createRadialGradient(o.x-r*0.25,o.y-r*0.3,2,o.x,o.y,r*1.9);
+  glow.addColorStop(0,"rgba(255,255,255,0.95)");
+  glow.addColorStop(0.32,hexA(col,0.85));
+  glow.addColorStop(1,hexA(col,0));
+  c.fillStyle=glow; c.beginPath(); c.arc(o.x,o.y,r*1.9,0,6.2832); c.fill();
+  c.fillStyle="rgba(5,12,30,0.82)"; c.beginPath(); c.arc(o.x,o.y,r,0,6.2832); c.fill();
+  c.strokeStyle=hexA(col, hov||o.held?1:0.75); c.lineWidth=hov||o.held?3:2;
+  c.beginPath(); c.arc(o.x,o.y,r,0,6.2832); c.stroke();
+
+  c.fillStyle=col; c.font="800 "+Math.round(r*0.6)+"px Segoe UI"; c.textAlign="center"; c.textBaseline="middle";
+  c.fillText(o.label,o.x,o.y);
+  c.textBaseline="alphabetic";
+  // teks jawaban di bawah orb
+  c.fillStyle="rgba(234,246,255,0.92)"; c.font="600 12px Segoe UI";
+  wrapText(c,o.text,o.x,o.y+r+15, Math.max(120,G.W/5.2), 14, 3);
+  // cincin konfirmasi
+  if(G.grab.on&&G.grab.orb===o&&G.mission!=="PULL"&&G.mission!=="SORT"){
+    var pr=clamp(G.grab.hold/CFG.hold,0,1);
+    c.strokeStyle="#ffd34d"; c.lineWidth=4;
+    c.beginPath(); c.arc(o.x,o.y,r+9,-Math.PI/2,-Math.PI/2+pr*6.2832); c.stroke();
+  }
+}
+
+function drawCursor(c){
+  var x=G.cursor.x,y=G.cursor.y;
+  var active=G.grab.on;
+  var g=c.createRadialGradient(x,y,1,x,y,46);
+  g.addColorStop(0, active?"rgba(255,211,77,0.85)":"rgba(34,231,255,0.8)");
+  g.addColorStop(0.45, active?"rgba(255,211,77,0.18)":"rgba(34,231,255,0.16)");
+  g.addColorStop(1,"rgba(0,0,0,0)");
+  c.fillStyle=g; c.beginPath(); c.arc(x,y,46,0,6.2832); c.fill();
+  c.strokeStyle=active?"#ffd34d":"rgba(255,255,255,0.9)"; c.lineWidth=2;
+  c.beginPath(); c.arc(x,y,active?11:15,0,6.2832); c.stroke();
+  c.beginPath(); c.moveTo(x-22,y); c.lineTo(x-7,y); c.moveTo(x+7,y); c.lineTo(x+22,y);
+  c.moveTo(x,y-22); c.lineTo(x,y-7); c.moveTo(x,y+7); c.lineTo(x,y+22); c.stroke();
+}
+
+function wrapText(c,text,x,y,maxW,lh,maxLines){
+  var words=String(text).split(" "), line="", lines=[];
+  for(var i=0;i<words.length;i++){
+    var test=line?line+" "+words[i]:words[i];
+    if(c.measureText(test).width>maxW&&line){ lines.push(line); line=words[i]; }
+    else line=test;
+    if(lines.length>=maxLines) break;
+  }
+  if(line&&lines.length<maxLines) lines.push(line);
+  for(var k=0;k<lines.length;k++){
+    var txt=lines[k];
+    if(k===maxLines-1&&(lines.length<words.length)&&c.measureText(txt).width>maxW-10) txt=txt+"…";
+    c.fillText(txt,x,y+k*lh);
+  }
+}
+function hexA(hex,a){
+  hex=String(hex).replace("#","");
+  if(hex.length===3) hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);
+  if(isNaN(r)||isNaN(g)||isNaN(b)) return "rgba(255,255,255,"+a+")";
+  return "rgba("+r+","+g+","+b+","+clamp(a,0,1)+")";
+}
+requestAnimationFrame(loop);
+
+/* ===================== KAMERA & MEDIAPIPE ===================== */
+var CAMERA={ stream:null };
+var HAND={ ready:false, lm:null, loading:false, raf:null, running:false,
+           sx:0.5, sy:0.5, pinch:1, present:false, lost:0, gesture:"—", pushCd:0 };
+
+function setMpStatus(txt, cls){
+  $("iMp").textContent=txt; $("tMp").textContent="MediaPipe: "+txt;
+  $("dMp").className="d "+(cls||"");
+}
+function setCamStatus(txt, cls){
+  $("iCam").textContent=txt; $("tCam").textContent="Kamera: "+txt;
+  $("dCam").className="d "+(cls||"");
+}
+
+function loadMediaPipe(){
+  if(HAND.ready) return Promise.resolve(true);
+  if(HAND.loading) return HAND.loading;
+  setMpStatus("memuat…","wa");
+  HAND.loading = import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs")
+    .then(function(mod){
+      return mod.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm")
+        .then(function(fs){
+          return mod.HandLandmarker.createFromOptions(fs,{
+            baseOptions:{ modelAssetPath:"https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task" },
+            runningMode:"VIDEO", numHands:1,
+            minHandDetectionConfidence:0.5, minHandPresenceConfidence:0.5, minTrackingConfidence:0.5
+          });
+        });
+    })
+    .then(function(hl){
+      HAND.model=hl; HAND.ready=true; setMpStatus("siap ✓","ok");
+      return true;
+    })
+    .catch(function(err){
+      console.warn("MediaPipe gagal:",err);
+      HAND.ready=false; HAND.loading=null;
+      setMpStatus("gagal dimuat","er");
+      $("calMsg").textContent="Model MediaPipe gagal dimuat (koneksi internet atau CDN diblokir). Kamu tetap bisa bermain dengan Mode Mouse.";
+      return false;
+    });
+  return HAND.loading;
+}
+
+function startCamera(){
+  if(CAMERA.stream) return Promise.resolve(true);
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    setCamStatus("tidak didukung","er");
+    $("calMsg").textContent="Browser ini tidak menyediakan akses kamera. Gunakan Mode Mouse.";
+    return Promise.resolve(false);
+  }
+  setCamStatus("meminta izin…","wa");
+  return navigator.mediaDevices.getUserMedia({ video:{ width:{ideal:640}, height:{ideal:480}, facingMode:"user" }, audio:false })
+    .then(function(st){
+      CAMERA.stream=st;
+      var v=$("vCal"); v.srcObject=st;
+      $("calPh").style.display="none";
+      return v.play().catch(function(){}).then(function(){
+        setCamStatus("aktif ✓","ok");
+        $("calMsg").textContent="Kamera aktif. Arahkan telunjuk ke dalam kotak, lalu coba mencubit.";
+        startHandLoop();
+        return true;
+      });
+    })
+    .catch(function(err){
+      console.warn("Kamera:",err);
+      CAMERA.stream=null;
+      var nm=err&&err.name?err.name:"Error";
+      var pesan = nm==="NotAllowedError" ? "Izin kamera ditolak. Klik ikon kamera di address bar untuk mengizinkan."
+               : nm==="NotFoundError" ? "Tidak ada perangkat kamera yang terdeteksi."
+               : nm==="NotReadableError" ? "Kamera sedang dipakai aplikasi lain."
+               : "Gagal membuka kamera ("+nm+").";
+      if(location.protocol==="file:") pesan+=" Catatan: halaman dibuka lewat file:// — jalankan melalui localhost atau HTTPS agar kamera dapat diakses.";
+      setCamStatus("gagal","er");
+      $("calMsg").textContent=pesan+" Kamu tetap bisa bermain dengan Mode Mouse.";
+      $("bPlayHand").disabled=true;
+      return false;
+    });
+}
+function stopCamera(){
+  stopHandLoop();
+  if(CAMERA.stream){
+    var tr=CAMERA.stream.getTracks();
+    for(var i=0;i<tr.length;i++) tr[i].stop();
+    CAMERA.stream=null;
+  }
+  $("vCal").srcObject=null; $("vGame").srcObject=null;
+  $("calPh").style.display="flex";
+  setCamStatus("nonaktif","");
+  $("iHand").textContent="—"; $("iGest").textContent="—"; $("iPos").textContent="—"; $("iPinch").textContent="—";
+  $("calMsg").textContent="Kamera dimatikan. Semua track video telah dihentikan.";
+  $("bPlayHand").disabled=true;
+  HAND.present=false; HAND.lm=null;
+  if(G.mode==="hand"){ G.mode="mouse"; $("sMode").textContent="Mouse"; $("mini").style.display="none"; }
+}
+
+function startHandLoop(){
+  if(HAND.running) return;
+  HAND.running=true;
+  var cc=$("cCal"), cx=cc.getContext("2d");
+  function step(){
+    if(!HAND.running){ return; }
+    HAND.raf=requestAnimationFrame(step);
+    var v = (current==="game"&&G.mode==="hand") ? $("vGame") : $("vCal");
+    if(!v||!CAMERA.stream||v.readyState<2) return;
+    if(HAND.ready&&HAND.model){
+      try{
+        var res=HAND.model.detectForVideo(v, performance.now());
+        processHand(res);
+      }catch(e){ /* lewati frame bermasalah */ }
+    }
+    // gambar landmark hanya saat kalibrasi
+    if(current==="calib"){
+      var rect=cc.getBoundingClientRect();
+      if(cc.width!==Math.floor(rect.width)||cc.height!==Math.floor(rect.height)){
+        cc.width=Math.floor(rect.width); cc.height=Math.floor(rect.height);
+      }
+      drawLandmarks(cx,cc.width,cc.height);
+    }
+  }
+  HAND.raf=requestAnimationFrame(step);
+}
+function stopHandLoop(){
+  HAND.running=false;
+  if(HAND.raf){ cancelAnimationFrame(HAND.raf); HAND.raf=null; }
+}
+
+function processHand(res){
+  var lms = res && res.landmarks && res.landmarks.length ? res.landmarks[0] : null;
+  if(!lms||lms.length<21){
+    HAND.lost++;
+    if(HAND.lost>10){
+      if(HAND.present){ HAND.present=false; HAND.lm=null; }
+      HAND.gesture="menunggu tangan";
+      $("iHand").textContent="MENUNGGU TANGAN"; $("iGest").textContent="—";
+      // tangan hilang lama -> lepaskan objek dengan aman
+      if(G.mode==="hand"&&G.grab.on) doRelease();
+    }
+    return;
+  }
+  HAND.lost=0; HAND.present=true; HAND.lm=lms;
+
+  var wrist=lms[0], mMcp=lms[9], idx=lms[8], th=lms[4];
+  var palm=Math.hypot(mMcp.x-wrist.x, mMcp.y-wrist.y) || 0.0001;
+  var pinch=Math.hypot(th.x-idx.x, th.y-idx.y)/palm;
+  HAND.pinch=pinch;
+
+  // posisi telunjuk (pratinjau dicerminkan -> gunakan 1-x agar terasa seperti cermin)
+  var nx=clamp(1-idx.x,0,1), ny=clamp(idx.y,0,1);
+  HAND.sx += (nx-HAND.sx)*0.4;
+  HAND.sy += (ny-HAND.sy)*0.4;
+
+  // telapak terbuka: rata-rata jarak ujung jari ke pergelangan
+  var sum=0, tips=[8,12,16,20];
+  for(var i=0;i<tips.length;i++){ var t=lms[tips[i]]; sum+=Math.hypot(t.x-wrist.x,t.y-wrist.y); }
+  var open=(sum/4)/palm;
+
+  var g;
+  if(pinch < CFG.pinch) g="GENGGAM";
+  else if(open > 1.75) g="TELAPAK TERBUKA (DORONG)";
+  else g="ARAHKAN";
+  HAND.gesture=g;
+
+  $("iHand").textContent="TANGAN TERDETEKSI";
+  $("iGest").textContent=g;
+  $("iPos").textContent=HAND.sx.toFixed(2)+", "+HAND.sy.toFixed(2);
+  $("iPinch").textContent=pinch.toFixed(2)+" / amb "+CFG.pinch.toFixed(2);
+  $("bPlayHand").disabled=false;
+
+  // kendalikan permainan
+  if(current==="game"&&G.mode==="hand"&&!G.paused){
+    G.cursor.x=clamp(HAND.sx*G.W,8,G.W-8);
+    G.cursor.y=clamp(HAND.sy*G.H,8,G.H-8);
+    if(g==="GENGGAM"){ if(!G.grab.on) doGrab(); }
+    else { if(G.grab.on) doRelease(); }
+    if(g.indexOf("DORONG")>=0){
+      if(performance.now()>HAND.pushCd){ pushAway(); HAND.pushCd=performance.now()+260; wave(G.cursor.x,G.cursor.y,"#9b5cff"); }
+    }
+  }
+}
+
+var CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],
+          [9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+function drawLandmarks(c,w,h){
+  c.clearRect(0,0,w,h);
+  if(!HAND.lm) return;
+  function px(p){ return [ (1-p.x)*w, p.y*h ]; } // cerminkan agar cocok dengan tampilan video
+  c.strokeStyle="rgba(34,231,255,0.8)"; c.lineWidth=2;
+  for(var i=0;i<CONN.length;i++){
+    var a=px(HAND.lm[CONN[i][0]]), b=px(HAND.lm[CONN[i][1]]);
+    c.beginPath(); c.moveTo(a[0],a[1]); c.lineTo(b[0],b[1]); c.stroke();
+  }
+  for(var j=0;j<HAND.lm.length;j++){
+    var p=px(HAND.lm[j]);
+    c.fillStyle = (j===8)?"#ffd34d":((j===4)?"#ff5cb1":"#22e7ff");
+    c.beginPath(); c.arc(p[0],p[1],(j===8||j===4)?6:3.5,0,6.2832); c.fill();
+  }
+  // lingkaran kursor
+  var cx=HAND.sx*w, cy=HAND.sy*h;
+  c.strokeStyle = HAND.pinch<CFG.pinch ? "#ffd34d" : "rgba(255,255,255,0.85)";
+  c.lineWidth=2; c.beginPath(); c.arc(cx,cy,16,0,6.2832); c.stroke();
+}
+
+$("bCamOn").onclick=function(){
+  $("calMsg").textContent="Menyiapkan model dan meminta izin kamera…";
+  loadMediaPipe().then(function(){ return startCamera(); });
+};
+$("bCamOff").onclick=function(){ stopCamera(); };
+$("bPlayHand").onclick=function(){
+  if(!CAMERA.stream){ toast("Aktifkan kamera dulu."); return; }
+  if(!HAND.ready){ toast("Model belum siap. Coba lagi atau pakai Mode Mouse."); return; }
+  startGame("hand");
+};
+function syncCalInputs(){
+  $("rPinch").value=CFG.pinch; $("rHold").value=CFG.hold;
+}
+$("rPinch").oninput=function(){ CFG.pinch=parseFloat(this.value)||0.42; saveCfg(); };
+$("rHold").oninput=function(){ CFG.hold=parseInt(this.value,10)||800; saveCfg(); };
+
+/* ===================== MODE GURU ===================== */
+/* PIN guru tidak ditulis sebagai teks biasa dan tidak pernah ditampilkan di layar.
+   Disimpan dalam bentuk tersandi base64. Ini hanya pengunci antarmuka lokal,
+   bukan sistem keamanan server. */
+var PIN_ENC="SW5vdmF0aWY=";
+function pinMatches(v){
+  var real;
+  try{ real=atob(PIN_ENC); }catch(e){ real=""; }
+  if(!real || v.length!==real.length) return false;
+  var diff=0;
+  for(var i=0;i<real.length;i++) diff |= (v.charCodeAt(i)^real.charCodeAt(i));
+  return diff===0;
+}
+
+var pinTries=0, pinLockUntil=0;
+function checkPin(){
+  var msg=$("pinMsg"), box=$("pinInput");
+  var now=Date.now();
+  if(now<pinLockUntil){
+    msg.textContent="Terlalu banyak percobaan. Tunggu "+Math.ceil((pinLockUntil-now)/1000)+" detik.";
+    return;
+  }
+  var v=box.value;
+  if(!v){ msg.textContent="PIN belum diisi."; box.focus(); return; }
+  if(pinMatches(v)){
+    pinTries=0;
+    msg.textContent="";
+    box.value="";
+    box.type="password";
+    $("pinEye").textContent="👁️";
+    $("tGate").style.display="none";
+    $("tPanel").style.display="block";
+    fillCfgInputs(); renderQList(); renderRecap();
+  }else{
+    pinTries++;
+    box.value=""; box.focus();
+    if(pinTries>=5){
+      pinLockUntil=now+15000; pinTries=0;
+      msg.textContent="PIN salah 5 kali. Coba lagi dalam 15 detik.";
+    }else{
+      msg.textContent="PIN salah. Silakan coba lagi ("+pinTries+"/5).";
+    }
+  }
+}
+$("pinOk").onclick=checkPin;
+$("pinInput").addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); checkPin(); } });
+$("pinInput").addEventListener("input", function(){ $("pinMsg").textContent=""; });
+$("pinEye").onclick=function(){
+  var box=$("pinInput"), shown=box.type==="text";
+  box.type=shown?"password":"text";
+  this.textContent=shown?"👁️":"🙈";
+  this.setAttribute("aria-label", shown?"Tampilkan PIN":"Sembunyikan PIN");
+  box.focus();
+};
+
+function fillCfgInputs(){
+  $("cCount").value=CFG.count; $("cTime").value=CFG.time;
+  $("cPinch").value=CFG.pinch; $("cHold").value=CFG.hold; $("cSfx").checked=CFG.sfx;
+}
+$("bSaveCfg").onclick=function(){
+  var c=parseInt($("cCount").value,10), t=parseInt($("cTime").value,10);
+  var p=parseFloat($("cPinch").value), h=parseInt($("cHold").value,10);
+  if(isNaN(c)||c<3||c>50){ toast("Jumlah soal harus 3–50."); return; }
+  if(isNaN(t)||t<10||t>180){ toast("Durasi harus 10–180 detik."); return; }
+  if(isNaN(p)||p<0.2||p>0.75){ toast("Ambang cubit harus 0.20–0.75."); return; }
+  if(isNaN(h)||h<300||h>2000){ toast("Waktu konfirmasi harus 300–2000 ms."); return; }
+  CFG.count=c; CFG.time=t; CFG.pinch=p; CFG.hold=h; CFG.sfx=$("cSfx").checked;
+  saveCfg(); syncCalInputs(); $("bSound").textContent=CFG.sfx?"🔊":"🔇";
+  toast("Pengaturan disimpan.");
+};
+$("bWipe").onclick=function(){
+  if(!confirm("Hapus semua progres, rekor, dan rekap sesi di perangkat ini?")) return;
+  try{ localStorage.removeItem(LS.rec); localStorage.removeItem(LS.best); }catch(e){}
+  renderRecap(); updateRecordLabel(); toast("Progres dihapus.");
+};
+$("bRestore").onclick=function(){
+  if(!confirm("Kembalikan bank soal ke bawaan ("+BANK.length+" soal)?")) return;
+  try{ localStorage.removeItem(LS.q); }catch(e){}
+  renderQList(); toast("Bank soal bawaan dipulihkan.");
+};
+$("bExport").onclick=function(){
+  var data=JSON.stringify(getBank(),null,2);
+  var blob=new Blob([data],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a"); a.href=url; a.download="bank-soal-mindforce.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+  toast("Bank soal diekspor.");
+};
+$("bImport").onclick=function(){
+  var inp=document.createElement("input"); inp.type="file"; inp.accept="application/json,.json";
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0]; if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      try{
+        var arr=JSON.parse(fr.result);
+        if(!Array.isArray(arr)) throw 0;
+        var ok=[];
+        for(var i=0;i<arr.length;i++){
+          var q=arr[i];
+          if(q&&typeof q.q==="string"&&q.q.trim()&&Array.isArray(q.o)&&q.o.length===4&&
+             typeof q.a==="number"&&q.a>=0&&q.a<=3&&typeof q.e==="string"&&q.e.trim()){
+            ok.push({q:q.q.trim(),o:[String(q.o[0]),String(q.o[1]),String(q.o[2]),String(q.o[3])],a:q.a,e:q.e.trim(),d:q.d||"sedang"});
+          }
+        }
+        if(!ok.length){ toast("Tidak ada soal valid di berkas itu."); return; }
+        save(LS.q,ok); renderQList(); toast(ok.length+" soal berhasil diimpor.");
+      }catch(e){ toast("Berkas JSON tidak valid."); }
+    };
+    fr.readAsText(f);
+  };
+  inp.click();
+};
+$("bAddQ").onclick=function(){
+  var arr=getBank();
+  arr.unshift({q:"",o:["","","",""],a:0,e:"",d:"sedang"});
+  save(LS.q,arr); renderQList();
+  var first=$("qlist").querySelector("textarea"); if(first) first.focus();
+};
+
+function renderQList(){
+  var arr=getBank(), list=$("qlist");
+  $("qn").textContent=arr.length;
+  list.innerHTML="";
+  for(var i=0;i<arr.length;i++){
+    (function(ix){
+      var q=arr[ix];
+      var box=el("div","qitem");
+      var opts="";
+      for(var j=0;j<4;j++){
+        opts+='<div class="orow"><input type="radio" name="k'+ix+'" value="'+j+'" '+(q.a===j?"checked":"")+'>'+
+              '<input class="inp" type="text" data-o="'+j+'" value="'+esc(q.o[j])+'" placeholder="Opsi '+"ABCD"[j]+'"></div>';
+      }
+      box.innerHTML=
+        '<div class="head"><b style="color:var(--cyan)">Soal #'+(ix+1)+'</b>'+
+        '<span><button class="btn s" data-act="save">💾 Simpan</button> '+
+        '<button class="btn r s" data-act="del">🗑️ Hapus</button></span></div>'+
+        '<label>Pertanyaan</label><textarea class="inp" data-f="q">'+esc(q.q)+'</textarea>'+
+        '<label>Pilihan (pilih radio = kunci jawaban)</label><div class="opts">'+opts+'</div>'+
+        '<label>Pembahasan</label><textarea class="inp" data-f="e">'+esc(q.e)+'</textarea>'+
+        '<label>Tingkat kesulitan</label>'+
+        '<select class="inp" data-f="d">'+
+          '<option value="mudah"'+(q.d==="mudah"?" selected":"")+'>mudah</option>'+
+          '<option value="sedang"'+(!q.d||q.d==="sedang"?" selected":"")+'>sedang</option>'+
+          '<option value="menantang"'+(q.d==="menantang"?" selected":"")+'>menantang</option>'+
+        '</select>';
+      box.querySelector('[data-act="del"]').onclick=function(){
+        if(!confirm("Hapus soal #"+(ix+1)+"?")) return;
+        var a2=getBank(); a2.splice(ix,1);
+        if(!a2.length){ toast("Minimal harus ada 1 soal."); return; }
+        save(LS.q,a2); renderQList(); toast("Soal dihapus.");
+      };
+      box.querySelector('[data-act="save"]').onclick=function(){
+        var qt=box.querySelector('[data-f="q"]').value.trim();
+        var ex=box.querySelector('[data-f="e"]').value.trim();
+        var df=box.querySelector('[data-f="d"]').value;
+        var os=[], inputs=box.querySelectorAll('input[data-o]');
+        for(var m=0;m<inputs.length;m++) os.push(inputs[m].value.trim());
+        var sel=box.querySelector('input[name="k'+ix+'"]:checked');
+        var key=sel?parseInt(sel.value,10):-1;
+        if(!qt){ toast("Pertanyaan tidak boleh kosong."); return; }
+        if(os.length!==4||os.some(function(s){return !s;})){ toast("Keempat opsi harus diisi."); return; }
+        if(key<0||key>3){ toast("Pilih satu kunci jawaban."); return; }
+        if(!ex){ toast("Pembahasan tidak boleh kosong."); return; }
+        var a3=getBank(); a3[ix]={q:qt,o:os,a:key,e:ex,d:df};
+        save(LS.q,a3); renderQList(); toast("Soal #"+(ix+1)+" tersimpan.");
+      };
+      list.appendChild(box);
+    })(i);
+  }
+}
+function renderRecap(){
+  var r=load(LS.rec,[]), box=$("recap");
+  box.innerHTML="";
+  if(!r.length){ box.appendChild(el("p","dim","Belum ada sesi permainan yang tercatat.")); return; }
+  for(var i=0;i<r.length;i++){
+    var s=r[i], d=new Date(s.d);
+    var acc=s.t?Math.round(s.r/s.t*100):0;
+    box.appendChild(el("div",null,
+      '<div style="padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1);font-size:12.5px">'+
+      '<b>'+d.toLocaleString("id-ID")+'</b><br>'+
+      '<span class="dim">Skor '+s.s+' • Benar '+s.r+'/'+s.t+' ('+acc+'%) • '+s.sec+'s • mode '+(s.mode==="hand"?"gesture":"mouse")+'</span></div>'));
+  }
+}
+function updateRecordLabel(){
+  var b=load(LS.best,0), r=load(LS.rec,[]);
+  $("recText").textContent = b>0 ? ("Rekor skor: "+b+" • "+r.length+" sesi tercatat.") : "Belum ada rekor. Ayo main!";
+}
+
+/* ===================== INIT ===================== */
+$("bSound").textContent=CFG.sfx?"🔊":"🔇";
+setMpStatus("belum dimuat","");
+setCamStatus("nonaktif","");
+syncCalInputs();
+updateRecordLabel();
+go("splash");
+window.addEventListener("beforeunload", function(){ stopCamera(); });
+})();
+</script>
+</body>
+</html>
